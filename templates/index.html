@@ -1,20 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Django Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             text-align: center;
-            margin-top: 50px;
+            background: url('https://sinay.ai/wp-content/uploads/2022/08/shutterstock_795331030.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #fff;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 30px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            width: 250px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-radius: 15px;
+            z-index: 1000; /* Ensure it's on top */
+            overflow-y: auto; /* Make it scrollable */
+            transform: translateX(-100%); /* Initially hide it */
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.open {
+            transform: translateX(0); /* Open the sidebar */
+        }
+
+        .sidebar h2 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Heading for sections */
+        .sidebar .section-heading {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00eaff;
+            margin-top: 20px;
+            text-align: left;
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar li:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hamburger Menu Button */
+        .hamburger-menu {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            z-index: 1100;
+        }
+
+        .hamburger-menu div {
+            width: 100%;
+            height: 4px;
+            background-color: white;
+            margin: 6px 0;
+            border-radius: 5px;
+        }
+
+        /* Main Content Styles */
+        .content {
+            margin-left: 270px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 30px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+    background: rgba(255, 255, 255, 0.25); /* Less transparent for better contrast */
+    backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+}
+
+.label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #222; /* Dark gray for better visibility */
+    margin-top: 10px;
+}
+
+
+        /* Progress Bars */
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Colors for Different Parameters */
+        .ph-fill { background: linear-gradient(to right, red, yellow, green, lightblue, blue); }
+        .turbidity-fill { background: linear-gradient(to right, #00bfff, #6495ed, #4169e1, #00008b); }
+        .tds-fill { background: linear-gradient(to right, #ff5722, #ff9800, #ffeb3b); }
+        .conductivity-fill { background: linear-gradient(to right, #8e44ad, #9b59b6, #d2b4de); }
+        .do-fill { background: linear-gradient(to right, #3498db, #2ecc71, #27ae60); }
+
+        /* Report */
+        .report {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            backdrop-filter: blur(12px);
+            color: #fff;
+            font-size: 14px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        footer a {
+            color: #00eaff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
         }
     </style>
+    
 </head>
 <body>
-    <h1>Welcome to My Django App!</h1>
-    <p>This is a dynamically rendered HTML page.</p>
-    {{ ph }} and {{ tur }}
+    <!-- Hamburger Menu Button -->
+    <div class="hamburger-menu" onclick="toggleSidebar()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <!-- Sidebar with Options -->
+    <div class="sidebar">
+        <h2>Options</h2>
+        <div class="section-heading">Sensor Parameters</div>
+        <ul>
+            <li>Temperature</li>
+            <li>pH Buffer</li>
+            <li>Advanced Turbidity</li>
+            <li>TDS (Total Dissolved Solids)</li>
+            <li>Conductivity (μS/cm)</li>
+            <li>Dissolved Oxygen (mg/L)</li>
+            <li>Chlorine Level</li>
+            <li>Salinity</li>
+            <li>Ammonia Level</li>
+        </ul>
+        <div class="section-heading">Control-related Options</div>
+        <ul>
+            <li>Set Alert Thresholds</li>
+            <li>Calibration Mode</li>
+            <li>Change Data Interval</li>
+            <li>Historical Data</li>
+        </ul>
+        <div class="section-heading">Display-related Options</div>
+        <ul>
+            <li>View Graphs</li>
+            <li>Change Units</li>
+            <li>Switch to Dark Mode</li>
+            <li>Show Raw Data</li>
+        </ul>
+        <div class="section-heading">Feature-related Options</div>
+        <ul>
+            <li>Enable Auto-refresh</li>
+            <li>View Notifications</li>
+            <li>Configure Alerts</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h1>Water Quality Monitoring</h1>
+        <div class="container">
+            <div class="card"><label class="label">pH Level</label><div class="progress-bar"><div class="progress-fill ph-fill" id="phMeter"></div></div><div id="phValue">pH: {{ ph }}</div></div>
+            <div class="card"><label class="label">Turbidity (NTU)</label><div class="progress-bar"><div class="progress-fill turbidity-fill" id="turbMeter"></div></div><div id="turbValue">Turbidity: {{tur}} NTU</div></div>
+            <div class="card"><label class="label">TDS (ppm)</label><div class="progress-bar"><div class="progress-fill tds-fill" id="tdsMeter"></div></div><div id="tdsValue">TDS: 0 ppm</div></div>
+            <div class="card"><label class="label">Conductivity (μS/cm)</label><div class="progress-bar"><div class="progress-fill conductivity-fill" id="conductivityMeter"></div></div><div id="conductivityValue">Conductivity: 0 μS/cm</div></div>
+            <div class="card"><label class="label">Dissolved Oxygen (mg/L)</label><div class="progress-bar"><div class="progress-fill do-fill" id="doMeter"></div></div><div id="doValue">DO: 0 mg/L</div></div>
+            <div class="card report"><h3>Water Quality Report</h3><p id="reportText">Loading...</p></div>
+        </div>
+        <footer><p>&copy; 2025 Water Monitoring | <a href="#">Privacy Policy</a></p></footer>
+    </div>
 </body>
 </html>
